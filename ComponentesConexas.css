@@ -219,3 +219,14 @@ footer{
     margin: 20px 0 0 0;
     color: #9e9797;
 }
+
+.matrix {
+    display: grid;
+    gap: 5px;
+    margin: 10px 0;
+  }
+  
+  .matrix input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+  }
