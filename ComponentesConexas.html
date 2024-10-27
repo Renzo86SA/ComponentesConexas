@@ -36,8 +36,8 @@
             <img src="https://www.openbookproject.net/books/pythonds/_images/scc1.png" alt="" class="image-placeholder">
             <div class="text">
                 <h3>¿Que son las Componentes Conexas?</h3>
-                <p>En Aritmética Modular, dos números enteros a y b son considerados congruentes con un modulo c si, al dividir ambos por n, dejan el mismo residuo.</p>
-                <p>Esto significa que a diferencia entre a y b es un multiplo de c, es decir, a - b = Kn para algún número entero k. La congruencia modular es clave en muchas ramas de las matemáticas y tiene aplicaciones importantes encriptografía, como el algoritmo RSA.</p>
+                <p>El concepto de componentes conexas en teoría de grafos se formalizó en el siglo XX, aunque la teoría de grafos se remonta al trabajo de Euler en 1736.</p>
+                <p>Una componente conexa es un grupo de puntos en un grafo donde todos están conectados de alguna manera. Puedes ir de un punto a otro dentro del grupo sin salirte. Si el grafo tiene varios grupos así, cada uno es una componente conexa independiente, sin conexiones con otros grupos.</p>
             </div>
         </div>
     </section>
@@ -48,8 +48,10 @@
             <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSeaByuV22kC20eGhQ5O1ZerbgMHhqmppm7mg&s" alt="" class="image-placeholder">
             <div class="text">
                 <h3>Calculo de Componentes Conexas</h3>
-                <p>El inverso modular de un número a bajo un módulo n es el número x tal que el producto de a y x es congruente con 1 módulo n. Es decir, cumple la ecuación de la imagen.</p>
-                <p>Esto significa que x es el valor que, al multiplicarse por a, da un resultado que, al dividirlo por n, deja un residuo de 1. El inverso modular solo existe si a y n son coprimos (su máximo común divisor es 1).</p>
+                <p>Crear la matriz de adyacencia para representar las conexiones entre vértices, colocando "1" en la diagonal si es necesario.</p>
+                <p>Generar la matriz de caminos a partir de la matriz de adyacencia, indicando con "1" si es posible llegar de un vértice a otro.</p>
+                <p>Contar y ordenar los "1" en cada fila de la matriz de caminos, clasificando de mayor a menor; en caso de empate, prioriza la fila con el "1" más cercano a la primera columna.</p>
+                <p>Ordenar las columnas según el orden de las filas, lo que hace que las componentes conexas aparezcan como bloques diagonales llenos de "1" en la matriz ordenada.</p>
             </div>
         </div>
     </section>
@@ -60,6 +62,11 @@
             <label for="size">Ingrese el tamaño de la matriz:</label>
             <input type="number" id="size" min="2" max="10" value="3">
             <br>
+            <label>
+                <input type="checkbox" id="manualEntryCheckbox"> Rellenar datos de la matriz manualmente
+              </label>
+            <div id="manualMatrix" class="matrix" style="display: none;"></div>
+            
             <button onclick="generarMatrices()">Generar</button>
             
             <h3>1. Matriz de adyacencia:</h3>
