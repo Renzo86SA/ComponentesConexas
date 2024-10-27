@@ -19,14 +19,13 @@ function generarMatrizConDosComponentes(tamaño) {
         }
     }
 
-    // Retornar matriz garantizando al menos dos componentes
     return matriz;
 }
 
 // Calcular la matriz de caminos con la lógica de cierre transitivo y agregar 1's a la diagonal
 function calcularMatrizCaminos(matriz) {
     let tamaño = matriz.length;
-    let caminos = [...matriz];
+    let caminos = [...matriz.map(fila => [...fila])];
 
     // Agregar 1 a la diagonal
     for (let i = 0; i < tamaño; i++) {
@@ -46,24 +45,28 @@ function calcularMatrizCaminos(matriz) {
 // Ordenar la matriz según el número de 1's en cada fila
 function ordenarMatrizPorFilas(matriz) {
     return matriz
-        .map((fila, i) => [fila, i]) 
-        .sort((a, b) => b[0].reduce((acc, val) => acc + val, 0) - a[0].reduce((acc, val) => acc + val, 0))
-        .map(fila => fila[0]);
+        .map((fila, i) => ({ fila, diag: fila[i], index: i }))
+        .sort((a, b) => b.fila.reduce((acc, val) => acc + val, 0) - a.fila.reduce((acc, val) => acc + val, 0))
+        .map(({ fila, index }) => {
+            fila[index] = 1;  // Asegurar que el 1 en la diagonal se mantenga
+            return fila;
+        });
 }
 
 // Ordenar la matriz por columnas
 function ordenarMatrizPorColumnas(matriz) {
     let tamaño = matriz.length;
-    let ordenadas = [];
-    for (let i = 0; i < tamaño; i++) {
-        ordenadas[i] = [];
+
+    // Ordenar cada columna según el número de 1's en cada fila
+    let ordenadas = Array.from({ length: tamaño }, () => Array(tamaño).fill(0));
+    for (let j = 0; j < tamaño; j++) {
+        let columna = matriz.map((fila, i) => ({ valor: fila[j], diag: i === j ? 1 : 0, index: i }));
+        columna.sort((a, b) => b.valor - a.valor);
+        columna.forEach(({ valor, diag, index }, i) => {
+            ordenadas[i][j] = index === j ? 1 : valor;
+        });
     }
-    for (let i = 0; i < tamaño; i++) {
-        for (let j = 0; j < tamaño; j++) {
-            ordenadas[i][j] = matriz[j][i];
-        }
-    }
-    return ordenarMatrizPorFilas(ordenadas);
+    return ordenadas;
 }
 
 // Convertir la matriz a un string para mostrar
@@ -77,12 +80,10 @@ function generarGraficaComponentes(matriz) {
     let aristas = [];
     let tamaño = matriz.length;
 
-    // Crear nodos
     for (let i = 0; i < tamaño; i++) {
         nodos.push({ id: i + 1, label: (i + 1).toString() });
     }
 
-    // Crear aristas
     for (let i = 0; i < tamaño; i++) {
         for (let j = 0; j < tamaño; j++) {
             if (matriz[i][j] === 1 && i !== j) {
@@ -91,7 +92,6 @@ function generarGraficaComponentes(matriz) {
         }
     }
 
-    // Graficar
     let contenedor = document.getElementById('graphContainer');
     let datos = {
         nodes: new vis.DataSet(nodos),
@@ -114,28 +114,102 @@ function generarGraficaComponentes(matriz) {
 function generarMatrices() {
     let tamaño = parseInt(document.getElementById('size').value);
 
-    // Limitar tamaño de la matriz a un máximo de 10
     if (tamaño > 10) {
         alert("El tamaño de la matriz no puede ser mayor que 10");
         return;
     }
 
-    // Generar matriz de adyacencia con al menos 2 componentes conexas
     let matrizAdyacencia = generarMatrizConDosComponentes(tamaño);
     document.getElementById('matrizAdyacencia').value = matrizAString(matrizAdyacencia);
 
-    // Calcular matriz de caminos (agregar 1 a la diagonal)
     let matrizCaminosRes = calcularMatrizCaminos(matrizAdyacencia);
     document.getElementById('matrizCaminos').value = matrizAString(matrizCaminosRes);
 
-    // Ordenar la matriz por filas
     let matrizOrdenada = ordenarMatrizPorFilas(matrizCaminosRes);
     document.getElementById('matrizOrdenada').value = matrizAString(matrizOrdenada);
 
-    // Ordenar la matriz por columnas
     let matrizOrdenadaPorColumnas = ordenarMatrizPorColumnas(matrizOrdenada);
     document.getElementById('matrizOrdenadaColumnas').value = matrizAString(matrizOrdenadaPorColumnas);
 
-    // Generar gráfica de componentes conexas
     generarGraficaComponentes(matrizCaminosRes);
 }
+function mostrarMatrizManual() {
+    const tamaño = parseInt(document.getElementById('size').value);
+    const manualMatrixContainer = document.getElementById("manualMatrix");
+    manualMatrixContainer.innerHTML = ''; // Limpiar matriz anterior
+  
+    if (isNaN(tamaño) || tamaño < 2 || tamaño > 10) {
+      alert("Ingrese un tamaño de matriz válido (entre 2 y 10).");
+      return;
+    }
+  
+    // Crear casillas de verificación
+    manualMatrixContainer.style.gridTemplateColumns = `repeat(${tamaño}, 30px)`;
+    for (let i = 0; i < tamaño; i++) {
+      for (let j = 0; j < tamaño; j++) {
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = i === j; // Poner 1 en la diagonal
+        manualMatrixContainer.appendChild(checkbox);
+      }
+    }
+  
+    manualMatrixContainer.style.display = "grid";
+  }
+  
+  // Generar matriz de adyacencia a partir de entrada manual o automáticamente
+  function generarMatrizAdyacencia(tamaño) {
+    const manualEntry = document.getElementById("manualEntryCheckbox").checked;
+    let matriz = Array(tamaño).fill(0).map(() => Array(tamaño).fill(0));
+  
+    if (manualEntry) {
+      const checkboxes = document.querySelectorAll("#manualMatrix input[type='checkbox']");
+      checkboxes.forEach((checkbox, index) => {
+        const row = Math.floor(index / tamaño);
+        const col = index % tamaño;
+        matriz[row][col] = checkbox.checked ? 1 : 0;
+      });
+    } else {
+      matriz = generarMatrizConDosComponentes(tamaño);
+    }
+  
+    return matriz;
+  }
+  
+  // Función para generar matrices y gráfica
+  function generarMatrices() {
+    const tamaño = parseInt(document.getElementById('size').value);
+  
+    if (isNaN(tamaño) || tamaño < 2 || tamaño > 10) {
+      alert("Ingrese un tamaño de matriz válido (entre 2 y 10).");
+      return;
+    }
+  
+    // Generar matriz de adyacencia (manual o automática)
+    const matrizAdyacencia = generarMatrizAdyacencia(tamaño);
+    document.getElementById('matrizAdyacencia').value = matrizAString(matrizAdyacencia);
+  
+    // Calcular matriz de caminos
+    const matrizCaminos = calcularMatrizCaminos(matrizAdyacencia);
+    document.getElementById('matrizCaminos').value = matrizAString(matrizCaminos);
+  
+    // Ordenar matriz por filas
+    const matrizOrdenada = ordenarMatrizPorFilas(matrizCaminos);
+    document.getElementById('matrizOrdenada').value = matrizAString(matrizOrdenada);
+  
+    // Ordenar matriz por columnas
+    const matrizOrdenadaColumnas = ordenarMatrizPorColumnas(matrizOrdenada);
+    document.getElementById('matrizOrdenadaColumnas').value = matrizAString(matrizOrdenadaColumnas);
+  
+    // Generar gráfica de componentes conexas
+    generarGraficaComponentes(matrizCaminos);
+  }
+  
+  // Mostrar la matriz manual cuando se selecciona la opción
+  document.getElementById("manualEntryCheckbox").addEventListener("change", function() {
+    if (this.checked) {
+      mostrarMatrizManual();
+    } else {
+      document.getElementById("manualMatrix").style.display = "none";
+    }
+  });
