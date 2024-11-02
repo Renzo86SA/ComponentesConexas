@@ -114,8 +114,8 @@ function generarGraficaComponentes(matriz) {
 function generarMatrices() {
     let tamaño = parseInt(document.getElementById('size').value);
 
-    if (tamaño > 10) {
-        alert("El tamaño de la matriz no puede ser mayor que 10");
+    if (tamaño > 16) {
+        alert("El tamaño de la matriz no puede ser mayor que 16");
         return;
     }
 
@@ -138,8 +138,8 @@ function mostrarMatrizManual() {
     const manualMatrixContainer = document.getElementById("manualMatrix");
     manualMatrixContainer.innerHTML = ''; // Limpiar matriz anterior
   
-    if (isNaN(tamaño) || tamaño < 2 || tamaño > 10) {
-      alert("Ingrese un tamaño de matriz válido (entre 2 y 10).");
+    if (isNaN(tamaño) || tamaño < 2 || tamaño > 16) {
+      alert("Ingrese un tamaño de matriz válido (entre 2 y 16).");
       return;
     }
   
@@ -180,8 +180,8 @@ function mostrarMatrizManual() {
   function generarMatrices() {
     const tamaño = parseInt(document.getElementById('size').value);
   
-    if (isNaN(tamaño) || tamaño < 2 || tamaño > 10) {
-      alert("Ingrese un tamaño de matriz válido (entre 2 y 10).");
+    if (isNaN(tamaño) || tamaño < 2 || tamaño > 16) {
+      alert("Ingrese un tamaño de matriz válido (entre 2 y 16).");
       return;
     }
   
